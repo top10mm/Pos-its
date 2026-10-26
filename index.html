@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meus Post-its Offline</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f0f2f5;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+      background: #ffffff;
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      color: #333;
+      font-size: 1.5rem;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button.btn-export {
+      background-color: #28a745;
+    }
+    button.btn-export:hover {
+      background-color: #218838;
+    }
+
+    button.btn-import {
+      background-color: #17a2b8;
+    }
+    button.btn-import:hover {
+      background-color: #138496;
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .postit {
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 2px 4px 10px rgba(0,0,0,0.15);
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s;
+      position: relative;
+    }
+
+    .postit:hover {
+      transform: translateY(-3px);
+    }
+
+    .postit-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: #222;
+      word-break: break-word;
+    }
+
+    .postit-content {
+      color: #444;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      flex-grow: 1;
+    }
+
+    .postit-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.6);
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #333;
+      font-size: 0.8rem;
+    }
+
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Cores dos Post-its */
+    .color-yellow { background-color: #fff59d; }
+    .color-pink   { background-color: #ffab91; }
+    .color-green  { background-color: #a5d6a7; }
+    .color-blue   { background-color: #81d4fa; }
+    .color-purple { background-color: #e1bee7; }
+
+    /* Modal Form */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .modal-content h2 {
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .color-picker {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .color-option {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .color-option.selected {
+      border-color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📌 Meus Post-its</h1>
+    <div class="btn-group">
+      <button onclick="openModal()">+ Nova Nota</button>
+      <button class="btn-export" onclick="exportData()">💾 Backup</button>
+      <button class="btn-import" onclick="document.getElementById('importFile').click()">📂 Restaurar</button>
+      <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
+    </div>
+  </header>
+
+  <div class="notes-grid" id="notesGrid"></div>
+
+  <!-- Modal para Criar / Editar Nota -->
+  <div class="modal" id="noteModal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Novo Post-it</h2>
+      <input type="hidden" id="noteId">
+      
+      <div class="form-group">
+        <label>Título</label>
+        <input type="text" id="noteTitleInput" placeholder="Ex: Compras da semana">
+      </div>
+
+      <div class="form-group">
+        <label>Conteúdo</label>
+        <textarea id="noteContentInput" rows="4" placeholder="Escreva aqui sua anotação..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Cor do Post-it</label>
+        <div class="color-picker" id="colorPicker">
+          <div class="color-option color-yellow selected" data-color="yellow" onclick="selectColor('yellow')"></div>
+          <div class="color-option color-pink" data-color="pink" onclick="selectColor('pink')"></div>
+          <div class="color-option color-green" data-color="green" onclick="selectColor('green')"></div>
+          <div class="color-option color-blue" data-color="blue" onclick="selectColor('blue')"></div>
+          <div class="color-option color-purple" data-color="purple" onclick="selectColor('purple')"></div>
+        </div>
+      </div>
+
+      <div class="btn-group" style="justify-content: flex-end; margin-top: 15px;">
+        <button style="background: #6c757d;" onclick="closeModal()">Cancelar</button>
+        <button onclick="saveNote()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- BANCO DE DADOS EMBUTIDO (IndexedDB) ---
+    let db;
+    let selectedColor = 'yellow';
+
+    const dbRequest = indexedDB.open("PostItDB", 1);
+
+    dbRequest.onupgradeneeded = function(e) {
+      db = e.target.result;
+      if (!db.objectStoreNames.contains("notes")) {
+        db.createObjectStore("notes", { keyPath: "id", autoIncrement: true });
+      }
+    };
+
+    dbRequest.onsuccess = function(e) {
+      db = e.target.result;
+      renderNotes();
+    };
+
+    dbRequest.onerror = function(e) {
+      console.error("Erro ao abrir banco de dados local:", e);
+    };
+
+    // --- RENDERIZAR NOTAS ---
+    function renderNotes() {
+      const grid = document.getElementById("notesGrid");
+      grid.innerHTML = "";
+
+      const transaction = db.transaction(["notes"], "readonly");
+      const store = transaction.objectStore("notes");
+      const request = store.getAll();
+
+      request.onsuccess = function() {
+        const notes = request.result;
+        if (notes.length === 0) {
+          grid.innerHTML = "<p style='color: #777; grid-column: 1/-1; text-align: center;'>Nenhum Post-it cadastrado. Clique em '+ Nova Nota' para criar!</p>";
+          return;
+        }
+
+        notes.reverse().forEach(note => {
+          const card = document.createElement("div");
+          card.className = `postit color-${note.color || 'yellow'}`;
+          card.innerHTML = `
+            <div>
+              <div class="postit-title">${escapeHtml(note.title)}</div>
+              <div class="postit-content">${escapeHtml(note.content)}</div>
+            </div>
+            <div class="postit-actions">
+              <button class="btn-action" onclick="editNote(${note.id})">✏️ Editar</button>
+              <button class="btn-action" onclick="deleteNote(${note.id})">🗑️ Excluir</button>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      };
+    }
+
+    // --- SALVAR / EDITAR / EXCLUIR ---
+    function saveNote() {
+      const id = document.getElementById("noteId").value;
+      const title = document.getElementById("noteTitleInput").value.trim();
+      const content = document.getElementById("noteContentInput").value.trim();
+
+      if (!title) {
+        alert("Por favor, informe um título!");
+        return;
+      }
+
+      const noteData = { title, content, color: selectedColor, date: new Date().toISOString() };
+      
+      const transaction = db.transaction(["notes"], "readwrite");
+      const store = transaction.objectStore("notes");
+
+      if (id) {
+        noteData.id = parseInt(id);
+        store.put(noteData);
+      } else {
+        store.add(noteData);
+      }
+
+      transaction.oncomplete = function() {
+        closeModal();
+        renderNotes();
+      };
+    }
+
+    function editNote(id) {
+      const transaction = db.transaction(["notes"], "readonly");
+      const store = transaction.objectStore("notes");
+      const request = store.get(id);
+
+      request.onsuccess = function() {
+        const note = request.result;
+        if (note) {
+          document.getElementById("noteId").value = note.id;
+          document.getElementById("noteTitleInput").value = note.title;
+          document.getElementById("noteContentInput").value = note.content;
+          selectColor(note.color || 'yellow');
+          document.getElementById("modalTitle").innerText = "Editar Post-it";
+          document.getElementById("noteModal").style.display = "flex";
+        }
+      };
+    }
+
+    function deleteNote(id) {
+      if (confirm("Deseja realmente excluir esta nota?")) {
+        const transaction = db.transaction(["notes"], "readwrite");
+        const store = transaction.objectStore("notes");
+        store.delete(id);
+        transaction.oncomplete = function() {
+          renderNotes();
+        };
+      }
+    }
+
+    // --- MODAL & CORES ---
+    function openModal() {
+      document.getElementById("noteId").value = "";
+      document.getElementById("noteTitleInput").value = "";
+      document.getElementById("noteContentInput").value = "";
+      selectColor('yellow');
+      document.getElementById("modalTitle").innerText = "Novo Post-it";
+      document.getElementById("noteModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("noteModal").style.display = "none";
+    }
+
+    function selectColor(color) {
+      selectedColor = color;
+      document.querySelectorAll('.color-option').forEach(el => {
+        el.classList.toggle('selected', el.dataset.color === color);
+      });
+    }
+
+    // --- EXPORTAR E IMPORTAR (BACKUP) ---
+    function exportData() {
+      const transaction = db.transaction(["notes"], "readonly");
+      const store = transaction.objectStore("notes");
+      const request = store.getAll();
+
+      request.onsuccess = function() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(request.result, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `postit_backup_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+      };
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedNotes = JSON.parse(e.target.result);
+          if (Array.isArray(importedNotes)) {
+            const transaction = db.transaction(["notes"], "readwrite");
+            const store = transaction.objectStore("notes");
+
+            // Limpa o banco atual antes de restaurar
+            store.clear().onsuccess = function() {
+              importedNotes.forEach(note => {
+                delete note.id; // gera novos IDs automaticamente
+                store.add(note);
+              });
+            };
+
+            transaction.oncomplete = function() {
+              alert("Backup restaurado com sucesso!");
+              renderNotes();
+            };
+          } else {
+            alert("Arquivo de backup inválido.");
+          }
+        } catch (err) {
+          alert("Erro ao ler o arquivo de backup.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+  </script>
+</body>
+</html>
