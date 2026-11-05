@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
+<meta name="theme-color" content="#8b6bd6">
+<link rel="manifest" href="./manifest.webmanifest">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meus Post-its Offline</title>
@@ -76,7 +78,7 @@
     }
 
     .postit {
-      padding: 15px;
+      padding: 18px;
       border-radius: 8px;
       box-shadow: 2px 4px 10px rgba(0,0,0,0.15);
       min-height: 180px;
@@ -85,6 +87,7 @@
       justify-content: space-between;
       transition: transform 0.2s;
       position: relative;
+      overflow: hidden;
     }
 
     .postit:hover {
@@ -97,6 +100,7 @@
       margin-bottom: 8px;
       color: #222;
       word-break: break-word;
+      z-index: 2;
     }
 
     .postit-content {
@@ -105,17 +109,35 @@
       white-space: pre-wrap;
       word-break: break-word;
       flex-grow: 1;
+      z-index: 2;
     }
 
     .postit-actions {
       display: flex;
       justify-content: flex-end;
+      align-items: flex-end;
       gap: 8px;
       margin-top: 10px;
+      z-index: 2;
     }
 
+    .alarm-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .alarm-status {
+      font-size: 0.65rem;
+      font-weight: bold;
+      margin-top: 2px;
+    }
+
+    .status-on { color: #2e7d32; }
+    .status-off { color: #c62828; }
+
     .btn-action {
-      background: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.75);
       border: none;
       padding: 4px 8px;
       border-radius: 4px;
@@ -125,17 +147,148 @@
     }
 
     .btn-action:hover {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
     }
 
-    /* Cores dos Post-its */
+    /* Cores e Estampas dos Post-its */
     .color-yellow { background-color: #fff59d; }
     .color-pink   { background-color: #ffab91; }
     .color-green  { background-color: #a5d6a7; }
     .color-blue   { background-color: #81d4fa; }
     .color-purple { background-color: #e1bee7; }
 
-    /* Modal Form */
+    .color-striped-orange-green {
+      background: repeating-linear-gradient(
+        45deg,
+        #ffab91,
+        #ffab91 3.75px,
+        #a5d6a7 3.75px,
+        #a5d6a7 7.5px
+      );
+    }
+
+    .color-rainbow-blue {
+      background: linear-gradient(180deg, #b3e5fc 0%, #81d4fa 100%);
+      position: relative;
+    }
+    .color-rainbow-blue::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 90px;
+      background: radial-gradient(ellipse at bottom, transparent 40%, rgba(255,118,117,0.4) 42%, rgba(250,177,160,0.4) 48%, rgba(255,234,167,0.4) 54%, rgba(85,239,196,0.4) 60%, rgba(116,185,255,0.4) 66%, rgba(162,155,254,0.4) 72%, transparent 74%);
+      pointer-events: none;
+    }
+
+    .color-sheep-sky {
+      background-color: #e3f2fd;
+      padding-top: 36px;
+      background-image: 
+        radial-gradient(circle 12px at 15% 8%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 8px at 22% 6%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 8px at 9% 6%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 14px at 80% 80%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 9px at 88% 78%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 9px at 72% 78%, #ffffff 100%, transparent 0%);
+      position: relative;
+    }
+    .color-sheep-sky::after {
+      content: "🐑 ☁️     🐑 ☁️";
+      position: absolute;
+      top: 4px; left: 10px; right: 10px;
+      font-size: 0.85rem;
+      pointer-events: none;
+      display: flex;
+      justify-content: space-around;
+      opacity: 0.9;
+    }
+
+    .color-daisies-purple {
+      background-color: #f3e5f5;
+      padding: 24px;
+    }
+    .color-daisies-purple::before, .color-daisies-purple::after {
+      content: "🌼 🌼 🌼 🌼 🌼 🌼 🌼 🌼 🌼";
+      position: absolute;
+      left: 4px; right: 4px;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-align: center;
+      pointer-events: none;
+    }
+    .color-daisies-purple::before { top: 4px; }
+    .color-daisies-purple::after { bottom: 4px; }
+
+    .color-pastel-roses {
+      background-color: #fffde7;
+      padding: 24px;
+    }
+    .color-pastel-roses::before, .color-pastel-roses::after {
+      content: "🌹 🌷 🌹 🌷 🌹 🌷 🌹 🌷 🌹";
+      position: absolute;
+      left: 4px; right: 4px;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-align: center;
+      pointer-events: none;
+    }
+    .color-pastel-roses::before { top: 4px; }
+    .color-pastel-roses::after { bottom: 4px; }
+
+    .color-lilac-yellow-dots {
+      background-color: #e1bee7;
+      background-image: 
+        radial-gradient(circle, #ffee58 2.5px, transparent 2.5px),
+        radial-gradient(circle, #ffee58 2.5px, transparent 2.5px);
+      background-size: 20px 20px;
+      background-position: 0 0, 10px 10px;
+    }
+
+    .color-pink-blue-dots {
+      background-color: #fce4ec;
+      background-image: 
+        radial-gradient(circle, #81d4fa 2.5px, transparent 2.5px),
+        radial-gradient(circle, #81d4fa 2.5px, transparent 2.5px);
+      background-size: 20px 20px;
+      background-position: 0 0, 10px 10px;
+    }
+
+    .color-sky-clouds-star {
+      background-color: #81d4fa;
+      background-image: 
+        radial-gradient(circle 22px at 80% 18%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 16px at 73% 15%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 16px at 87% 15%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 35px at 50% 50%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 25px at 40% 48%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 25px at 60% 48%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 22px at 20% 82%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 16px at 13% 85%, #ffffff 100%, transparent 0%),
+        radial-gradient(circle 16px at 27% 85%, #ffffff 100%, transparent 0%);
+      position: relative;
+    }
+
+    .color-sky-clouds-star::after {
+      content: "";
+      position: absolute;
+      top: 45%;
+      right: 18%;
+      width: 24px;
+      height: 24px;
+      background: #ffeb3b;
+      border-radius: 50%;
+      pointer-events: none;
+      box-shadow: 
+        0 -14px 0 -4px #fbc02d,
+        0 14px 0 -4px #fbc02d,
+        -14px 0 0 -4px #fbc02d,
+        14px 0 0 -4px #fbc02d,
+        -10px -10px 0 -4px #fbc02d,
+        10px 10px 0 -4px #fbc02d,
+        -10px 10px 0 -4px #fbc02d,
+        10px -10px 0 -4px #fbc02d;
+    }
+
+    /* Modais */
     .modal {
       display: none;
       position: fixed;
@@ -144,6 +297,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      z-index: 1000;
     }
 
     .modal-content {
@@ -151,12 +305,82 @@
       padding: 20px;
       border-radius: 12px;
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
     .modal-content h2 {
       margin-bottom: 15px;
+    }
+
+    .alarm-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .alarm-modal-header h2 {
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .switch-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .alarm-section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+    }
+
+    /* Interruptor ON/OFF */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .3s;
+      border-radius: 26px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #28a745;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
     }
 
     .form-group {
@@ -176,22 +400,81 @@
       border-radius: 6px;
     }
 
+    /* Modal de alarme disparado */
+    @keyframes alarmPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(220,53,69,0.55); }
+      50%      { box-shadow: 0 0 0 16px rgba(220,53,69,0); }
+    }
+    #alarmRingModal .modal-content {
+      border: 3px solid #dc3545;
+      animation: alarmPulse 1s infinite;
+      text-align: center;
+    }
+    .alarm-ring-title { font-weight: bold; font-size: 1.25rem; margin: 12px 0 8px; color: #222; word-break: break-word; }
+    .alarm-ring-content { color: #555; margin-bottom: 18px; white-space: pre-wrap; word-break: break-word; }
+
     .color-picker {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
       margin-top: 8px;
     }
 
     .color-option {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid transparent;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      transition: transform 0.15s, border-color 0.15s;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .color-option:hover {
+      transform: scale(1.1);
     }
 
     .color-option.selected {
-      border-color: #000;
+      border-color: #222;
+      transform: scale(1.15);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    }
+
+    .color-option.color-striped-orange-green {
+      background: repeating-linear-gradient(45deg, #ffab91, #ffab91 3.75px, #a5d6a7 3.75px, #a5d6a7 7.5px);
+    }
+
+    .color-option.color-rainbow-blue {
+      background-color: #81d4fa;
+      background-image: radial-gradient(circle at 50% 120%, transparent 42%, #ff7675 45%, #fab1a0 50%, #ffeaa7 55%, #55efc4 60%, #74b9ff 65%, #a29bfe 70%, transparent 73%);
+    }
+
+    .color-option.color-lilac-yellow-dots {
+      background-color: #e1bee7;
+      background-image: radial-gradient(circle, #ffee58 1.5px, transparent 1.5px);
+      background-size: 12px 12px;
+    }
+
+    .color-option.color-pink-blue-dots {
+      background-color: #fce4ec;
+      background-image: radial-gradient(circle, #81d4fa 1.5px, transparent 1.5px);
+      background-size: 12px 12px;
+    }
+
+    .color-option.color-sky-clouds-star {
+      background-color: #81d4fa;
+    }
+    .color-option.color-sky-clouds-star::after {
+      content: "☀️";
+      font-size: 15px;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
     }
   </style>
 </head>
@@ -201,7 +484,7 @@
     <h1>📌 Meus Post-its</h1>
     <div class="btn-group">
       <button onclick="openModal()">+ Nova Nota</button>
-      <button class="btn-export" onclick="exportData()">💾 Backup</button>
+      <button class="btn-export" onclick="exportData()">💾 Cópia de Segurança</button>
       <button class="btn-import" onclick="document.getElementById('importFile').click()">📂 Restaurar</button>
       <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
     </div>
@@ -222,17 +505,73 @@
 
       <div class="form-group">
         <label>Conteúdo</label>
-        <textarea id="noteContentInput" rows="4" placeholder="Escreva aqui sua anotação..."></textarea>
+        <textarea id="noteContentInput" rows="3" placeholder="Escreva aqui a sua anotação..."></textarea>
       </div>
 
       <div class="form-group">
-        <label>Cor do Post-it</label>
+        <label>Cor ou Estampa do Post-it</label>
         <div class="color-picker" id="colorPicker">
-          <div class="color-option color-yellow selected" data-color="yellow" onclick="selectColor('yellow')"></div>
-          <div class="color-option color-pink" data-color="pink" onclick="selectColor('pink')"></div>
-          <div class="color-option color-green" data-color="green" onclick="selectColor('green')"></div>
-          <div class="color-option color-blue" data-color="blue" onclick="selectColor('blue')"></div>
-          <div class="color-option color-purple" data-color="purple" onclick="selectColor('purple')"></div>
+          <div class="color-option color-yellow selected" data-color="yellow" onclick="selectColor('yellow')" title="Amarelo"></div>
+          <div class="color-option color-pink" data-color="pink" onclick="selectColor('pink')" title="Rosa"></div>
+          <div class="color-option color-green" data-color="green" onclick="selectColor('green')" title="Verde"></div>
+          <div class="color-option color-blue" data-color="blue" onclick="selectColor('blue')" title="Azul"></div>
+          <div class="color-option color-purple" data-color="purple" onclick="selectColor('purple')" title="Roxo"></div>
+          
+          <div class="color-option color-striped-orange-green" data-color="striped-orange-green" onclick="selectColor('striped-orange-green')" title="Listrado Laranja e Verde"></div>
+          <div class="color-option color-rainbow-blue" data-color="rainbow-blue" onclick="selectColor('rainbow-blue')" title="Azul com Arco-íris"></div>
+          <div class="color-option color-sheep-sky" data-color="sheep-sky" onclick="selectColor('sheep-sky')" title="Céu com Carneirinhos">🐑</div>
+          <div class="color-option color-daisies-purple" data-color="daisies-purple" onclick="selectColor('daisies-purple')" title="Margaridas no Lilás">🌼</div>
+          <div class="color-option color-pastel-roses" data-color="pastel-roses" onclick="selectColor('pastel-roses')" title="Rosas no Amarelo Pastel">🌹</div>
+          <div class="color-option color-lilac-yellow-dots" data-color="lilac-yellow-dots" onclick="selectColor('lilac-yellow-dots')" title="Lilás com Bolinhas Amarelas"></div>
+          <div class="color-option color-pink-blue-dots" data-color="pink-blue-dots" onclick="selectColor('pink-blue-dots')" title="Rosa com Bolinhas Azul Claro"></div>
+          <div class="color-option color-sky-clouds-star" data-color="sky-clouds-star" onclick="selectColor('sky-clouds-star')" title="Céu Azul com Nuvens e Sol"></div>
+        </div>
+      </div>
+
+      <!-- Configuração de Alarme dentro do próprio Post-it -->
+      <div class="form-group" style="margin-top: 5px;">
+        <div class="alarm-section-title">
+          <span>⏰ Alarme</span>
+          <div class="switch-wrap">
+            <label class="switch">
+              <input type="checkbox" id="noteAlarmToggleInput" onchange="toggleNoteAlarmFields()">
+              <span class="slider"></span>
+            </label>
+            <span class="alarm-status status-off" id="noteAlarmToggleLabel">OFF</span>
+          </div>
+        </div>
+
+        <div id="noteAlarmFields" style="display:none; margin-top: 12px;">
+          <div class="form-group">
+            <label>Data</label>
+            <input type="date" id="noteAlarmDateInput">
+          </div>
+          <div class="form-group">
+            <label>Horário</label>
+            <input type="time" id="noteAlarmTimeInput">
+          </div>
+          <div class="form-group">
+            <label>Repetição</label>
+            <select id="noteAlarmRepeatInput" onchange="toggleNoteRepeatOptions()">
+              <option value="none">Não se repete</option>
+              <option value="daily">Todo o dia</option>
+              <option value="weekly">Todas as semanas</option>
+              <option value="monthly">Todo o mês (mesmo dia)</option>
+              <option value="yearly">Todo o ano (mesma data)</option>
+            </select>
+          </div>
+          <div class="form-group" id="noteWeeklyGroup" style="display:none;">
+            <label>Dia da Semana</label>
+            <select id="noteAlarmDayOfWeekInput">
+              <option value="0">Domingo</option>
+              <option value="1">Segunda-feira</option>
+              <option value="2">Terça-feira</option>
+              <option value="3">Quarta-feira</option>
+              <option value="4">Quinta-feira</option>
+              <option value="5">Sexta-feira</option>
+              <option value="6">Sábado</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -243,46 +582,151 @@
     </div>
   </div>
 
+  <!-- Modal de Alarme Disparado -->
+  <div class="modal" id="alarmRingModal">
+    <div class="modal-content">
+      <h2 style="color:#dc3545;">⏰ Alarme!</h2>
+      <div class="alarm-ring-title" id="alarmRingTitle"></div>
+      <div class="alarm-ring-content" id="alarmRingContent"></div>
+      <button style="background:#dc3545; padding: 12px 24px; font-size: 1rem;" onclick="dismissActiveAlarm()">🔕 Parar Alarme</button>
+    </div>
+  </div>
+
+  <!-- Modal para Configurar Alarme -->
+  <div class="modal" id="alarmModal">
+    <div class="modal-content">
+      <div class="alarm-modal-header">
+        <h2>⏰ Configurar Alarme</h2>
+        <div class="switch-wrap">
+          <label class="switch">
+            <input type="checkbox" id="alarmToggleInput" checked onchange="updateAlarmToggleLabel()">
+            <span class="slider"></span>
+          </label>
+          <span class="alarm-status status-on" id="alarmToggleLabel">ON</span>
+        </div>
+      </div>
+      
+      <input type="hidden" id="alarmNoteId">
+      
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="alarmDateInput">
+      </div>
+
+      <div class="form-group">
+        <label>Horário</label>
+        <input type="time" id="alarmTimeInput">
+      </div>
+
+      <div class="form-group">
+        <label>Repetição</label>
+        <select id="alarmRepeatInput" onchange="toggleRepeatOptions()">
+          <option value="none">Não se repete</option>
+          <option value="daily">Todo o dia</option>
+          <option value="weekly">Todas as semanas</option>
+          <option value="monthly">Todo o mês (mesmo dia)</option>
+          <option value="yearly">Todo o ano (mesma data)</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="weeklyGroup" style="display:none;">
+        <label>Dia da Semana</label>
+        <select id="alarmDayOfWeekInput">
+          <option value="0">Domingo</option>
+          <option value="1">Segunda-feira</option>
+          <option value="2">Terça-feira</option>
+          <option value="3">Quarta-feira</option>
+          <option value="4">Quinta-feira</option>
+          <option value="5">Sexta-feira</option>
+          <option value="6">Sábado</option>
+        </select>
+      </div>
+
+      <div class="btn-group" style="justify-content: flex-end; margin-top: 15px;">
+        <button style="background: #6c757d;" onclick="closeAlarmModal()">Cancelar</button>
+        <button onclick="saveAlarm()">Salvar Alarme</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // --- BANCO DE DADOS EMBUTIDO (IndexedDB) ---
-    let db;
     let selectedColor = 'yellow';
+    let currentAlarmNoteId = null;
+    let globalAudioCtx = null;
+    let alarmMasterGain = null;
+    let ringingNoteId = null;
 
-    const dbRequest = indexedDB.open("PostItDB", 1);
-
-    dbRequest.onupgradeneeded = function(e) {
-      db = e.target.result;
-      if (!db.objectStoreNames.contains("notes")) {
-        db.createObjectStore("notes", { keyPath: "id", autoIncrement: true });
+    // Cria e/ou resume o AudioContext. Só pode ser desbloqueado dentro de um gesto do utilizador.
+    function ensureAudioContext() {
+      if (!globalAudioCtx) {
+        try {
+          globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+          return null;
+        }
       }
-    };
+      if (globalAudioCtx.state === 'suspended') {
+        globalAudioCtx.resume();
+      }
+      return globalAudioCtx;
+    }
 
-    dbRequest.onsuccess = function(e) {
-      db = e.target.result;
+    // Desbloqueia o áudio e pede permissão de notificação no PRIMEIRO gesto do utilizador
+    ['pointerdown', 'touchstart', 'keydown'].forEach(evt => {
+      document.addEventListener(evt, () => {
+        ensureAudioContext();
+        if (window.Notification && Notification.permission === 'default') {
+          Notification.requestPermission();
+        }
+      }, { once: true });
+    });
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open("PostItDB", 4);
+        request.onerror = e => reject(e.target.error);
+        request.onsuccess = e => resolve(e.target.result);
+        request.onupgradeneeded = e => {
+          const dbInstance = e.target.result;
+          if (!dbInstance.objectStoreNames.contains("notes")) {
+            dbInstance.createObjectStore("notes", { keyPath: "id", autoIncrement: true });
+          }
+        };
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
       renderNotes();
-    };
+      checkAlarms();
+      setInterval(checkAlarms, 5000);
+      // Navegadores adiam timers em abas ocultas: re-verifica ao voltar
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) checkAlarms(); });
+      window.addEventListener("focus", checkAlarms);
+    });
 
-    dbRequest.onerror = function(e) {
-      console.error("Erro ao abrir banco de dados local:", e);
-    };
+    async function renderNotes() {
+      try {
+        const db = await openDB();
+        const grid = document.getElementById("notesGrid");
+        grid.innerHTML = "";
 
-    // --- RENDERIZAR NOTAS ---
-    function renderNotes() {
-      const grid = document.getElementById("notesGrid");
-      grid.innerHTML = "";
+        const notes = await new Promise((resolve, reject) => {
+          const tx = db.transaction(["notes"], "readonly");
+          const req = tx.objectStore("notes").getAll();
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
 
-      const transaction = db.transaction(["notes"], "readonly");
-      const store = transaction.objectStore("notes");
-      const request = store.getAll();
-
-      request.onsuccess = function() {
-        const notes = request.result;
         if (notes.length === 0) {
           grid.innerHTML = "<p style='color: #777; grid-column: 1/-1; text-align: center;'>Nenhum Post-it cadastrado. Clique em '+ Nova Nota' para criar!</p>";
           return;
         }
 
         notes.reverse().forEach(note => {
+          const hasAlarm = note.alarm && note.alarm.active;
+          const statusText = hasAlarm ? "ON" : "OFF";
+          const statusClass = hasAlarm ? "status-on" : "status-off";
+
           const card = document.createElement("div");
           card.className = `postit color-${note.color || 'yellow'}`;
           card.innerHTML = `
@@ -291,144 +735,516 @@
               <div class="postit-content">${escapeHtml(note.content)}</div>
             </div>
             <div class="postit-actions">
+              <div class="alarm-container">
+                <button class="btn-action" onclick="openAlarmModal(${note.id})" title="Configurar Alarme">⏰</button>
+                <span class="alarm-status ${statusClass}">${statusText}</span>
+              </div>
               <button class="btn-action" onclick="editNote(${note.id})">✏️ Editar</button>
               <button class="btn-action" onclick="deleteNote(${note.id})">🗑️ Excluir</button>
             </div>
           `;
           grid.appendChild(card);
         });
-      };
+      } catch (err) {
+        console.error("Erro ao carregar notas:", err);
+      }
     }
 
-    // --- SALVAR / EDITAR / EXCLUIR ---
-    function saveNote() {
-      const id = document.getElementById("noteId").value;
-      const title = document.getElementById("noteTitleInput").value.trim();
-      const content = document.getElementById("noteContentInput").value.trim();
+    function updateAlarmToggleLabel() {
+      const on = document.getElementById("alarmToggleInput").checked;
+      const lbl = document.getElementById("alarmToggleLabel");
+      lbl.textContent = on ? "ON" : "OFF";
+      lbl.className = "alarm-status " + (on ? "status-on" : "status-off");
+    }
 
-      if (!title) {
-        alert("Por favor, informe um título!");
+    window.toggleNoteAlarmFields = function() {
+      const on = document.getElementById("noteAlarmToggleInput").checked;
+      document.getElementById("noteAlarmFields").style.display = on ? "block" : "none";
+      const lbl = document.getElementById("noteAlarmToggleLabel");
+      lbl.textContent = on ? "ON" : "OFF";
+      lbl.className = "alarm-status " + (on ? "status-on" : "status-off");
+    };
+
+    window.toggleNoteRepeatOptions = function() {
+      const repeat = document.getElementById("noteAlarmRepeatInput").value;
+      document.getElementById("noteWeeklyGroup").style.display = repeat === 'weekly' ? 'block' : 'none';
+    };
+
+    function resetNoteAlarmForm() {
+      const pad2 = n => String(n).padStart(2, '0');
+      const now = new Date();
+      document.getElementById("noteAlarmToggleInput").checked = false;
+      document.getElementById("noteAlarmDateInput").value = now.getFullYear() + '-' + pad2(now.getMonth()+1) + '-' + pad2(now.getDate());
+      document.getElementById("noteAlarmTimeInput").value = "12:00";
+      document.getElementById("noteAlarmRepeatInput").value = "none";
+      document.getElementById("noteAlarmDayOfWeekInput").value = "0";
+      toggleNoteRepeatOptions();
+      toggleNoteAlarmFields();
+    }
+
+    function fillNoteAlarmForm(alarm) {
+      const pad2 = n => String(n).padStart(2, '0');
+      if (alarm && alarm.timestamp) {
+        const d = new Date(alarm.timestamp);
+        document.getElementById("noteAlarmDateInput").value = d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate());
+        document.getElementById("noteAlarmTimeInput").value = pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+        document.getElementById("noteAlarmRepeatInput").value = alarm.repeat || "none";
+        document.getElementById("noteAlarmDayOfWeekInput").value = String(alarm.dayOfWeek || 0);
+        document.getElementById("noteAlarmToggleInput").checked = !!alarm.active;
+        toggleNoteRepeatOptions();
+        toggleNoteAlarmFields();
+      } else {
+        resetNoteAlarmForm();
+      }
+    }
+
+    function readNoteAlarmForm(prevAlarm) {
+      const active = document.getElementById("noteAlarmToggleInput").checked;
+      const date = document.getElementById("noteAlarmDateInput").value;
+      const time = document.getElementById("noteAlarmTimeInput").value;
+      const repeat = document.getElementById("noteAlarmRepeatInput").value;
+      const dayOfWeek = parseInt(document.getElementById("noteAlarmDayOfWeekInput").value);
+      if (active) {
+        if (!date || !time) {
+          alert("Você ativou o alarme: preencha a data e a hora (ou desative a chave).");
+          return undefined;
+        }
+        const timestamp = new Date(`${date}T${time}:00`).getTime();
+        return { timestamp, repeat, dayOfWeek, active: true };
+      }
+      if (prevAlarm) {
+        return { timestamp: prevAlarm.timestamp, repeat: prevAlarm.repeat || "none", dayOfWeek: prevAlarm.dayOfWeek || 0, active: false };
+      }
+      return null;
+    }
+
+    window.saveNote = async function() {
+      try {
+        const idInput = document.getElementById("noteId").value;
+        const title = document.getElementById("noteTitleInput").value.trim();
+        const content = document.getElementById("noteContentInput").value.trim();
+
+        if (!title) {
+          alert("Por favor, informe um título!");
+          return;
+        }
+
+        const db = await openDB();
+
+        if (idInput) {
+          const id = parseInt(idInput);
+          const note = await new Promise((resolve, reject) => {
+            const tx = db.transaction(["notes"], "readonly");
+            const req = tx.objectStore("notes").get(id);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+          });
+
+          if (note) {
+            note.title = title;
+            note.content = content;
+            note.color = selectedColor;
+            const alarm = readNoteAlarmForm(note.alarm);
+            if (alarm === undefined) return;
+            note.alarm = alarm;
+
+            await new Promise((resolve, reject) => {
+              const tx = db.transaction(["notes"], "readwrite");
+              tx.objectStore("notes").put(note);
+              tx.oncomplete = () => resolve();
+              tx.onerror = () => reject(tx.error);
+            });
+          }
+        } else {
+          const alarm = readNoteAlarmForm(null);
+          if (alarm === undefined) return;
+          const noteData = { 
+            title, 
+            content, 
+            color: selectedColor, 
+            date: new Date().toISOString(), 
+            alarm 
+          };
+
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(["notes"], "readwrite");
+            tx.objectStore("notes").add(noteData);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+          });
+        }
+
+        closeModal();
+        renderNotes();
+      } catch (err) {
+        alert("Erro ao salvar a nota: " + err.message);
+      }
+    };
+
+    window.openAlarmModal = async function(id) {
+      currentAlarmNoteId = id;
+      try {
+        const db = await openDB();
+        const note = await new Promise((resolve, reject) => {
+          const tx = db.transaction(["notes"], "readonly");
+          const req = tx.objectStore("notes").get(id);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+
+        if (note && note.alarm) {
+          const alarmDate = new Date(note.alarm.timestamp);
+          const pad2 = n => String(n).padStart(2, '0');
+          document.getElementById("alarmDateInput").value = alarmDate.getFullYear() + '-' + pad2(alarmDate.getMonth()+1) + '-' + pad2(alarmDate.getDate());
+          document.getElementById("alarmTimeInput").value = pad2(alarmDate.getHours()) + ':' + pad2(alarmDate.getMinutes());
+          document.getElementById("alarmRepeatInput").value = note.alarm.repeat || "none";
+          document.getElementById("alarmDayOfWeekInput").value = note.alarm.dayOfWeek || "0";
+          document.getElementById("alarmToggleInput").checked = !!note.alarm.active;
+        } else {
+          document.getElementById("alarmDateInput").value = new Date().toISOString().slice(0,10);
+          document.getElementById("alarmTimeInput").value = "12:00";
+          document.getElementById("alarmRepeatInput").value = "none";
+          document.getElementById("alarmDayOfWeekInput").value = "0";
+          document.getElementById("alarmToggleInput").checked = true;
+        }
+        toggleRepeatOptions();
+        updateAlarmToggleLabel();
+        document.getElementById("alarmModal").style.display = "flex";
+      } catch (err) {
+        console.error("Erro ao abrir alarme:", err);
+      }
+    };
+
+    window.closeAlarmModal = function() {
+      document.getElementById("alarmModal").style.display = "none";
+    };
+
+    window.toggleRepeatOptions = function() {
+      const repeat = document.getElementById("alarmRepeatInput").value;
+      document.getElementById("weeklyGroup").style.display = repeat === 'weekly' ? 'block' : 'none';
+    };
+
+    window.saveAlarm = async function() {
+      const isActive = document.getElementById("alarmToggleInput").checked;
+      const date = document.getElementById("alarmDateInput").value;
+      const time = document.getElementById("alarmTimeInput").value;
+      const repeat = document.getElementById("alarmRepeatInput").value;
+      const dayOfWeek = document.getElementById("alarmDayOfWeekInput").value;
+
+      if (!date || !time) {
+        alert("Por favor, selecione a data e a hora do alarme!");
         return;
       }
 
-      const noteData = { title, content, color: selectedColor, date: new Date().toISOString() };
-      
-      const transaction = db.transaction(["notes"], "readwrite");
-      const store = transaction.objectStore("notes");
-
-      if (id) {
-        noteData.id = parseInt(id);
-        store.put(noteData);
-      } else {
-        store.add(noteData);
+      if (window.Notification && Notification.permission !== "granted") {
+        Notification.requestPermission();
       }
 
-      transaction.oncomplete = function() {
-        closeModal();
-        renderNotes();
-      };
+      // Garante que o AudioContext está ativo (gesto do utilizador: clique em salvar)
+      ensureAudioContext();
+
+      const timestamp = new Date(`${date}T${time}:00`).getTime();
+
+      try {
+        const db = await openDB();
+        const note = await new Promise((resolve, reject) => {
+          const tx = db.transaction(["notes"], "readonly");
+          const req = tx.objectStore("notes").get(currentAlarmNoteId);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+
+        if (note) {
+          note.alarm = {
+            timestamp,
+            repeat,
+            dayOfWeek: parseInt(dayOfWeek),
+            active: isActive
+          };
+
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(["notes"], "readwrite");
+            tx.objectStore("notes").put(note);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+          });
+
+          closeAlarmModal();
+          renderNotes();
+        }
+      } catch (err) {
+        alert("Erro ao salvar alarme: " + err.message);
+      }
+    };
+
+    async function checkAlarms() {
+      try {
+        const db = await openDB();
+        const now = Date.now();
+        
+        const notes = await new Promise((resolve, reject) => {
+          const tx = db.transaction(["notes"], "readonly");
+          const req = tx.objectStore("notes").getAll();
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+
+        for (const note of notes) {
+          if (note.alarm && note.alarm.active && note.alarm.timestamp) {
+            if (now >= note.alarm.timestamp) {
+              triggerAlarmNotification(note);
+
+              if (note.alarm.repeat === 'none') {
+                note.alarm.active = false;
+              } else {
+                note.alarm.timestamp = calculateNextAlarmTimestamp(note.alarm);
+              }
+
+              await new Promise((resolve, reject) => {
+                const tx = db.transaction(["notes"], "readwrite");
+                tx.objectStore("notes").put(note);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+              });
+
+              renderNotes();
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao verificar alarmes:", err);
+      }
     }
 
-    function editNote(id) {
-      const transaction = db.transaction(["notes"], "readonly");
-      const store = transaction.objectStore("notes");
-      const request = store.get(id);
+    function triggerAlarmNotification(note) {
+      playAlarmSound();
+      showAlarmRing(note);
 
-      request.onsuccess = function() {
-        const note = request.result;
+      if (navigator.vibrate) {
+        try { navigator.vibrate([400, 150, 400, 150, 400, 150, 400]); } catch (e) {}
+      }
+
+      let notified = false;
+      try {
+        if (window.Notification && Notification.permission === "granted") {
+          new Notification(`⏰ Lembrete: ${note.title}`, {
+            body: note.content || "Tem um compromisso agendado!"
+          });
+          notified = true;
+        }
+      } catch (e) {
+        console.error("Erro na notificação:", e);
+      }
+
+      if (!notified) {
+        alert(`⏰ ALARME: ${note.title}\n\n${note.content || ""}`);
+      }
+    }
+
+    // Popup visual que garante feedback mesmo se o som for bloqueado
+    function showAlarmRing(note) {
+      ringingNoteId = note.id;
+      document.getElementById("alarmRingTitle").textContent = note.title;
+      document.getElementById("alarmRingContent").textContent = note.content || "";
+      document.getElementById("alarmRingModal").style.display = "flex";
+    }
+
+    window.dismissActiveAlarm = function() {
+      stopAlarmSound();
+      ringingNoteId = null;
+      document.getElementById("alarmRingModal").style.display = "none";
+    };
+
+    // Som de despertador ("TRIM TRIM") que toca por até 30 segundos, até ser parado
+    function playAlarmSound() {
+      try {
+        const ctx = ensureAudioContext();
+        if (!ctx) return;
+
+        stopAlarmSound();
+
+        const master = ctx.createGain();
+        master.gain.value = 0.9;
+        master.connect(ctx.destination);
+        alarmMasterGain = master;
+
+        const start = ctx.currentTime + 0.05;
+        const end = start + 30;
+        let t = start;
+        while (t < end) {
+          for (let i = 0; i < 10; i++) {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            const p = t + (i * 0.03);
+
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(i % 2 === 0 ? 2500 : 2000, p);
+
+            g.gain.setValueAtTime(0.0001, p);
+            g.gain.exponentialRampToValueAtTime(0.5, p + 0.006);
+            g.gain.exponentialRampToValueAtTime(0.0001, p + 0.028);
+
+            osc.connect(g);
+            g.connect(master);
+            osc.start(p);
+            osc.stop(p + 0.03);
+          }
+          t += 0.65; // 0.3s de toque + 0.35s de pausa
+        }
+      } catch (e) {
+        console.error("Erro ao tocar o som do alarme:", e);
+      }
+    }
+
+    function stopAlarmSound() {
+      if (alarmMasterGain) {
+        try { alarmMasterGain.disconnect(); } catch (e) {}
+        alarmMasterGain = null;
+      }
+    }
+
+    function calculateNextAlarmTimestamp(alarm) {
+      const dateObj = new Date(alarm.timestamp);
+      const now = Date.now();
+      const advance = () => {
+        if (alarm.repeat === 'daily') {
+          dateObj.setDate(dateObj.getDate() + 1);
+        } else if (alarm.repeat === 'weekly') {
+          // Avança até o próximo dia da semana escolhido (nunca fica no passado)
+          do {
+            dateObj.setDate(dateObj.getDate() + 1);
+          } while (dateObj.getDay() !== (alarm.dayOfWeek || 0));
+        } else if (alarm.repeat === 'monthly') {
+          dateObj.setMonth(dateObj.getMonth() + 1);
+        } else if (alarm.repeat === 'yearly') {
+          dateObj.setFullYear(dateObj.getFullYear() + 1);
+        } else {
+          dateObj.setDate(dateObj.getDate() + 1);
+        }
+      };
+      do {
+        advance();
+      } while (dateObj.getTime() <= now);
+      return dateObj.getTime();
+    }
+
+    window.editNote = async function(id) {
+      try {
+        const db = await openDB();
+        const note = await new Promise((resolve, reject) => {
+          const tx = db.transaction(["notes"], "readonly");
+          const req = tx.objectStore("notes").get(id);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+
         if (note) {
           document.getElementById("noteId").value = note.id;
           document.getElementById("noteTitleInput").value = note.title;
           document.getElementById("noteContentInput").value = note.content;
           selectColor(note.color || 'yellow');
+          fillNoteAlarmForm(note.alarm);
           document.getElementById("modalTitle").innerText = "Editar Post-it";
           document.getElementById("noteModal").style.display = "flex";
         }
-      };
-    }
-
-    function deleteNote(id) {
-      if (confirm("Deseja realmente excluir esta nota?")) {
-        const transaction = db.transaction(["notes"], "readwrite");
-        const store = transaction.objectStore("notes");
-        store.delete(id);
-        transaction.oncomplete = function() {
-          renderNotes();
-        };
+      } catch (err) {
+        console.error("Erro ao editar nota:", err);
       }
-    }
+    };
 
-    // --- MODAL & CORES ---
-    function openModal() {
+    window.deleteNote = async function(id) {
+      if (confirm("Deseja realmente excluir esta nota?")) {
+        try {
+          const db = await openDB();
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(["notes"], "readwrite");
+            tx.objectStore("notes").delete(id);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+          });
+          renderNotes();
+        } catch (err) {
+          console.error("Erro ao excluir nota:", err);
+        }
+      }
+    };
+
+    window.openModal = function() {
       document.getElementById("noteId").value = "";
       document.getElementById("noteTitleInput").value = "";
       document.getElementById("noteContentInput").value = "";
       selectColor('yellow');
+      resetNoteAlarmForm();
       document.getElementById("modalTitle").innerText = "Novo Post-it";
       document.getElementById("noteModal").style.display = "flex";
-    }
+    };
 
-    function closeModal() {
+    window.closeModal = function() {
       document.getElementById("noteModal").style.display = "none";
-    }
+    };
 
-    function selectColor(color) {
+    window.selectColor = function(color) {
       selectedColor = color;
       document.querySelectorAll('.color-option').forEach(el => {
         el.classList.toggle('selected', el.dataset.color === color);
       });
-    }
+    };
 
-    // --- EXPORTAR E IMPORTAR (BACKUP) ---
-    function exportData() {
-      const transaction = db.transaction(["notes"], "readonly");
-      const store = transaction.objectStore("notes");
-      const request = store.getAll();
+    window.exportData = async function() {
+      try {
+        const db = await openDB();
+        const notes = await new Promise((resolve, reject) => {
+          const tx = db.transaction(["notes"], "readonly");
+          const req = tx.objectStore("notes").getAll();
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
 
-      request.onsuccess = function() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(request.result, null, 2));
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(notes, null, 2));
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", dataStr);
         downloadAnchor.setAttribute("download", `postit_backup_${new Date().toISOString().slice(0,10)}.json`);
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
-      };
-    }
+      } catch (err) {
+        console.error("Erro ao exportar dados:", err);
+      }
+    };
 
-    function importData(event) {
+    window.importData = async function(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         try {
           const importedNotes = JSON.parse(e.target.result);
           if (Array.isArray(importedNotes)) {
-            const transaction = db.transaction(["notes"], "readwrite");
-            const store = transaction.objectStore("notes");
-
-            // Limpa o banco atual antes de restaurar
-            store.clear().onsuccess = function() {
+            const db = await openDB();
+            await new Promise((resolve, reject) => {
+              const tx = db.transaction(["notes"], "readwrite");
+              const store = tx.objectStore("notes");
+              store.clear();
               importedNotes.forEach(note => {
-                delete note.id; // gera novos IDs automaticamente
+                delete note.id;
                 store.add(note);
               });
-            };
+              tx.oncomplete = () => resolve();
+              tx.onerror = () => reject(tx.error);
+            });
 
-            transaction.oncomplete = function() {
-              alert("Backup restaurado com sucesso!");
-              renderNotes();
-            };
+            alert("Cópia de segurança restaurada com sucesso!");
+            renderNotes();
           } else {
-            alert("Arquivo de backup inválido.");
+            alert("Ficheiro de cópia de segurança inválido.");
           }
         } catch (err) {
-          alert("Erro ao ler o arquivo de backup.");
+          alert("Erro ao ler o ficheiro de cópia de segurança.");
         }
       };
       reader.readAsText(file);
-    }
+    };
 
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, function(m) {
@@ -436,5 +1252,14 @@
       });
     }
   </script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(err => console.warn("Modo offline indisponível:", err));
+  });
+}
+</script>
+
 </body>
 </html>
