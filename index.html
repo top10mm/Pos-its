@@ -259,6 +259,12 @@
     .about-content a { color: #007bff; }
     .about-version { font-size: 0.8rem; color: #888; margin-bottom: 6px; }
     .about-icon { width: 64px; height: 64px; border-radius: 14px; display: block; margin-bottom: 8px; }
+    .license-content { max-width: 560px; }
+    .license-content h3.lic-title { font-size: 1.05rem; margin: 0 0 8px; }
+    .license-content h4 { font-size: 0.9rem; margin: 14px 0 4px; color: #333; }
+    .license-content p, .license-content li { margin-bottom: 6px; }
+    .license-content ul { list-style: none; padding-left: 4px; }
+    .license-content hr { border: 0; border-top: 1px solid #ddd; margin: 14px 0; }
     #btnInstall { display: none; margin-top: 12px; background: #ff9a4d; }
     #btnInstall:hover { background: #e67e2e; }
 
@@ -398,6 +404,7 @@
         <li><strong>Não pode ser distribuído</strong> por outra finalidade ou por outros meios.</li>
       </ul>
       <p>Todos os direitos reservados. Para qualquer outro uso, solicite autorização ao autor.</p>
+      <p><a href="#" onclick="openLicense(); return false;">📄 Consulte a Licença</a></p>
 
       <h3>👤 Autor</h3>
       <p>Marcelo Carrubba<br>
@@ -407,6 +414,39 @@
       <button id="btnInstall" onclick="installApp()">📲 Instalar o app</button>
       <div class="btn-group" style="justify-content: flex-end; margin-top: 15px;">
         <button style="background: #6c757d;" onclick="closeAbout()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Licença -->
+  <div class="modal" id="licenseModal" onclick="if(event.target===this)closeLicense()">
+    <div class="modal-content about-content license-content">
+        <h3 class="lic-title">TERMO DE LICENÇA DE USO - MEUS POST-ITS</h3>
+        <p>Copyright (c) 2026 Marcelo Carrubba. Todos os direitos reservados. Contato: top10mm@myyahoo.com</p>
+        <h4>1. CONCESSÃO DE USO</h4>
+        <p>É concedida a qualquer pessoa uma licença pessoal, gratuita, não exclusiva e revogável para ACESSAR e UTILIZAR o aplicativo &quot;Meus Post-its&quot; (o &quot;Software&quot;), seja pela web, seja instalado em celular ou computador, para fins pessoais ou profissionais próprios.</p>
+        <h4>2. RESTRIÇÕES</h4>
+        <p>Sem autorização prévia e por escrito do autor, é PROIBIDO:</p>
+        <ul>
+        <li>a) VENDER, alugar, sublicenciar ou cobrar, de qualquer forma, pelo Software ou por qualquer cópia dele;</li>
+        <li>b) ALTERAR, modificar, adaptar, traduzir, descompilar ou criar obras derivadas do Software ou de seu código-fonte;</li>
+        <li>c) DISTRIBUIR, republicar, hospedar em outro endereço ou compartilhar o Software, total ou parcialmente, para qualquer outra finalidade;</li>
+        <li>d) Remover ou ocultar os avisos de autoria e de direitos autorais.</li>
+        </ul>
+        <h4>3. CÓDIGO-FONTE</h4>
+        <p>O código-fonte está disponível publicamente neste repositório apenas para consulta e transparência. A visibilidade do código não representa permissão para copiá-lo, modificá-lo ou redistribuí-lo.</p>
+        <h4>4. PRIVACIDADE</h4>
+        <p>O Software funciona no próprio dispositivo do usuário. As notas são salvas localmente no navegador/aplicativo (IndexedDB) e não são enviadas a servidores do autor.</p>
+        <h4>5. ISENÇÃO DE GARANTIA</h4>
+        <p>O Software é fornecido &quot;NO ESTADO EM QUE SE ENCONTRA&quot;, sem garantias de qualquer tipo, expressas ou implícitas. O autor não se responsabiliza por perdas de dados ou quaisquer danos decorrentes do uso. Recomenda-se usar periodicamente a função de Backup do aplicativo.</p>
+        <h4>6. VIGÊNCIA</h4>
+        <p>O descumprimento de qualquer item deste termo encerra automaticamente a licença de uso concedida.</p>
+        <h4>7. OUTROS USOS</h4>
+        <p>Para qualquer uso não previsto neste termo, entre em contato com o autor: Marcelo Carrubba - top10mm@myyahoo.com</p>
+        <hr>
+        <p>SUMMARY (English) &quot;Meus Post-its&quot; is free to use, via the web or installed on phone/computer. It may NOT be sold, modified, or distributed for any other purpose without written permission from the author. All rights reserved. Author: Marcelo Carrubba - top10mm@myyahoo.com</p>
+      <div class="btn-group" style="justify-content: flex-end; margin-top: 15px;">
+        <button style="background: #6c757d;" onclick="closeLicense()">Fechar</button>
       </div>
     </div>
   </div>
@@ -646,8 +686,16 @@
     window.closeAbout = function() {
       document.getElementById("aboutModal").style.display = "none";
     };
+    window.openLicense = function() {
+      document.getElementById("licenseModal").style.display = "flex";
+    };
+    window.closeLicense = function() {
+      document.getElementById("licenseModal").style.display = "none";
+    };
     document.addEventListener("keydown", function(e) {
-      if (e.key === "Escape") closeAbout();
+      if (e.key !== "Escape") return;
+      if (document.getElementById("licenseModal").style.display === "flex") closeLicense();
+      else closeAbout();
     });
 
     let deferredInstall = null;
