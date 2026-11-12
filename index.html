@@ -3,7 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meus Post-its Offline</title>
+  <title>Meus Post-its</title>
+  <meta name="description" content="Meus Post-its - notas adesivas gratuitas que funcionam offline. Por Marcelo Carrubba.">
+  <meta name="author" content="Marcelo Carrubba">
+  <meta name="theme-color" content="#ff9a4d">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Post-its">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <style>
     * {
       box-sizing: border-box;
@@ -224,6 +235,33 @@
       background-position: 0 0, 10px 10px;
     }
 
+    /* Botão Sobre (?) discreto + modal Sobre */
+    header { position: relative; padding-right: 48px; }
+    .btn-about {
+      position: absolute;
+      top: 10px; right: 12px;
+      width: 24px; height: 24px;
+      padding: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #8a8f98;
+      border: 1px solid #c9cdd3;
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1;
+      opacity: 0.7;
+    }
+    .btn-about:hover { background: #eceef1; color: #333; opacity: 1; }
+    .about-content { max-height: 90vh; overflow-y: auto; }
+    .about-content h3 { font-size: 0.95rem; margin: 14px 0 4px; color: #333; }
+    .about-content p, .about-content li { font-size: 0.9rem; color: #444; line-height: 1.5; }
+    .about-content ul { padding-left: 20px; }
+    .about-content a { color: #007bff; }
+    .about-version { font-size: 0.8rem; color: #888; margin-bottom: 6px; }
+    .about-icon { width: 64px; height: 64px; border-radius: 14px; display: block; margin-bottom: 8px; }
+    #btnInstall { display: none; margin-top: 12px; background: #ff9a4d; }
+    #btnInstall:hover { background: #e67e2e; }
+
     /* Modal */
     .modal {
       display: none;
@@ -333,9 +371,45 @@
       <button class="btn-import" onclick="document.getElementById('importFile').click()">📂 Restaurar</button>
       <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
     </div>
+    <button class="btn-about" onclick="openAbout()" title="Sobre" aria-label="Sobre o aplicativo">?</button>
   </header>
 
   <div class="notes-grid" id="notesGrid"></div>
+
+  <!-- Modal Sobre -->
+  <div class="modal" id="aboutModal" onclick="if(event.target===this)closeAbout()">
+    <div class="modal-content about-content">
+      <img class="about-icon" src="icons/icon-192.png" alt="Ícone do app">
+      <h2>Meus Post-its</h2>
+      <p class="about-version">Versão 10.0</p>
+      <p>Aplicativo de notas adesivas, simples, gratuito e que funciona offline. Suas notas ficam salvas somente no seu dispositivo.</p>
+
+      <h3>📲 Como usar</h3>
+      <ul>
+        <li>Acesse pelo navegador (web): <a href="https://top10mm.github.io/Pos-its/" target="_blank" rel="noopener">top10mm.github.io/Pos-its</a></li>
+        <li>Pode ser instalado no celular e no computador (PWA): no Chrome/Edge use "Instalar app"; no iPhone use Compartilhar &rarr; "Adicionar à Tela de Início".</li>
+      </ul>
+
+      <h3>📜 Licença de uso</h3>
+      <ul>
+        <li>Uso <strong>gratuito</strong>.</li>
+        <li><strong>Não pode ser vendido</strong>.</li>
+        <li><strong>Não pode ser alterado</strong> (modificado ou adaptado).</li>
+        <li><strong>Não pode ser distribuído</strong> por outra finalidade ou por outros meios.</li>
+      </ul>
+      <p>Todos os direitos reservados. Para qualquer outro uso, solicite autorização ao autor.</p>
+
+      <h3>👤 Autor</h3>
+      <p>Marcelo Carrubba<br>
+      Contato: <a href="mailto:top10mm@myyahoo.com">top10mm@myyahoo.com</a></p>
+      <p style="margin-top:8px;">&copy; 2026 Marcelo Carrubba</p>
+
+      <button id="btnInstall" onclick="installApp()">📲 Instalar o app</button>
+      <div class="btn-group" style="justify-content: flex-end; margin-top: 15px;">
+        <button style="background: #6c757d;" onclick="closeAbout()">Fechar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal -->
   <div class="modal" id="noteModal">
@@ -563,6 +637,42 @@
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, function(m) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+    // ---------- Sobre / PWA ----------
+    window.openAbout = function() {
+      document.getElementById("aboutModal").style.display = "flex";
+    };
+    window.closeAbout = function() {
+      document.getElementById("aboutModal").style.display = "none";
+    };
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") closeAbout();
+    });
+
+    let deferredInstall = null;
+    window.addEventListener("beforeinstallprompt", function(e) {
+      e.preventDefault();
+      deferredInstall = e;
+      document.getElementById("btnInstall").style.display = "inline-block";
+    });
+    window.installApp = function() {
+      if (!deferredInstall) return;
+      deferredInstall.prompt();
+      deferredInstall.userChoice.finally(function() {
+        deferredInstall = null;
+        document.getElementById("btnInstall").style.display = "none";
+      });
+    };
+    window.addEventListener("appinstalled", function() {
+      document.getElementById("btnInstall").style.display = "none";
+    });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function() {
+        navigator.serviceWorker.register("sw.js").catch(function(err) {
+          console.warn("Service Worker não registrado:", err);
+        });
       });
     }
   </script>
