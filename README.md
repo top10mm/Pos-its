@@ -20,6 +20,9 @@
 
 - 📝 Crie, edite e exclua notas
 - 🎨 Vários papéis de parede e cores para os post-its
+- ✍️ Escolha a cor e o tamanho da letra de cada nota
+- ↕️ Arraste as notas para organizar na ordem que preferir
+- 🗑️ Lixeira com "Desfazer": notas excluídas podem ser restauradas em até 30 dias
 - 💾 Backup e restauração das suas notas em arquivo
 - 📴 Funciona offline depois do primeiro acesso
 - 🔒 Suas notas ficam **somente no seu dispositivo**
