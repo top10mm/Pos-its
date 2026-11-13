@@ -315,6 +315,8 @@
     /* Contorno do texto (cor de contorno vem de --to; espessura acompanha o tamanho da letra) */
     .postit.has-outline .postit-title,
     .postit.has-outline .postit-content {
+      letter-spacing: 0.08em;
+      word-spacing: 0.15em;
       --t: calc(var(--fs, 1) * 1.2px);
       --n: calc(var(--fs, 1) * -1.2px);
       text-shadow:
@@ -541,7 +543,7 @@
     <div class="modal-content about-content">
       <img class="about-icon" src="icons/icon-192.png" alt="Ícone do app">
       <h2>Meus Post-its</h2>
-      <p class="about-version">Versão 10.03</p>
+      <p class="about-version">Versão 10.04</p>
       <p>Aplicativo de notas adesivas, simples, gratuito e que funciona offline. Suas notas ficam salvas somente no seu dispositivo.</p>
 
       <h3>📲 Como usar</h3>
@@ -712,8 +714,10 @@
 
     // ---------- Configurações de texto (cor e tamanho) ----------
     const TRASH_DAYS = 30;
-    const ORANGE = '#ff9a4d';   // laranja do tema do app (mesmo da barra/ícone)
-    const LILAC  = '#b784e0';
+    const ORANGE = '#ff6700';   // laranja fluorescente
+    const LILAC  = '#7b3fc9';   // lilás forte e escuro
+    // Valores da versão anterior, convertidos automaticamente para os novos
+    const LEGACY_COLORS = { '#ff9a4d': ORANGE, '#b784e0': LILAC };
     // v = cor do texto, o = cor do contorno (vazio = sem contorno)
     const TEXT_COLORS = [
       { v: '',        o: '',     t: 'Padrão' },
@@ -724,7 +728,8 @@
       { v: '#1b5e20', o: '',     t: 'Verde' },
       { v: ORANGE,    o: LILAC,  t: 'Laranja com contorno lilás' },
       { v: LILAC,     o: ORANGE, t: 'Lilás com contorno laranja' },
-      { v: '#f2ff00', o: '',     t: 'Amarelo fluorescente' }
+      { v: '#f2ff00', o: '',     t: 'Amarelo fluorescente' },
+      { v: '#ff1fa5', o: '',     t: 'Rosa fluorescente' }
     ];
     const FONT_SIZES = {
       s:  { f: 0.85, t: 'Pequena' },
@@ -739,7 +744,10 @@
     const DRAG_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="#555" aria-hidden="true"><circle cx="4" cy="3" r="1.4"/><circle cx="10" cy="3" r="1.4"/><circle cx="4" cy="7" r="1.4"/><circle cx="10" cy="7" r="1.4"/><circle cx="4" cy="11" r="1.4"/><circle cx="10" cy="11" r="1.4"/></svg>';
 
     // Validações (protegem contra valores estranhos vindos de backups)
-    function safeTextColor(v) { return (typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v)) ? v : ''; }
+    function safeTextColor(v) {
+      if (typeof v !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(v)) return '';
+      return LEGACY_COLORS[v.toLowerCase()] || v;
+    }
     function safeFontSize(v) { return Object.prototype.hasOwnProperty.call(FONT_SIZES, v) ? v : 'm'; }
     function safeColorName(v) { return (typeof v === 'string' && /^[a-z-]+$/.test(v)) ? v : 'yellow'; }
     // Ordem de exibição: menor vem primeiro. Notas antigas (sem "order") mantêm "mais nova primeiro".
