@@ -1,6 +1,6 @@
 // Service Worker - Meus Post-its
 // Ao publicar uma nova versão do app, altere o número abaixo para atualizar o cache.
-const CACHE = 'postits-v10.04';
+const CACHE = 'postits-v10.07';
 const ARQUIVOS = [
   './',
   './index.html',
