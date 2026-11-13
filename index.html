@@ -309,7 +309,20 @@
     .tc-auto { background: #f5f5f5; color: #555; font-size: 0.8rem; }
     .fs-option { border-radius: 8px; background: #f5f5f5; color: #333; }
     .tc-option:hover, .fs-option:hover { transform: scale(1.1); }
-    .tc-option.selected, .fs-option.selected { border-color: #222; transform: scale(1.15); }
+    .fs-option.selected { border-color: #222; transform: scale(1.15); }
+    .tc-option.selected { box-shadow: 0 0 0 2px #222; transform: scale(1.15); }
+
+    /* Contorno do texto (cor de contorno vem de --to; espessura acompanha o tamanho da letra) */
+    .postit.has-outline .postit-title,
+    .postit.has-outline .postit-content {
+      --t: calc(var(--fs, 1) * 1.2px);
+      --n: calc(var(--fs, 1) * -1.2px);
+      text-shadow:
+        var(--n) var(--n) 0 var(--to), var(--t) var(--n) 0 var(--to),
+        var(--n) var(--t) 0 var(--to), var(--t) var(--t) 0 var(--to),
+        0 var(--n) 0 var(--to), 0 var(--t) 0 var(--to),
+        var(--n) 0 0 var(--to), var(--t) 0 0 var(--to);
+    }
 
     .postit-preview { min-height: 0; margin-top: 4px; }
     .postit-preview:hover { transform: none; }
@@ -352,10 +365,13 @@
     .toast button:hover { background: rgba(255,255,255,0.12); }
 
     /* Botão Sobre (?) discreto + modal Sobre */
-    header { position: relative; padding-right: 48px; }
-    .btn-about {
+    header { position: relative; padding-right: 84px; }
+    .header-corner {
       position: absolute;
       top: 10px; right: 12px;
+      display: flex; gap: 6px;
+    }
+    .btn-about {
       width: 24px; height: 24px;
       padding: 0;
       border-radius: 50%;
@@ -368,6 +384,8 @@
       opacity: 0.7;
     }
     .btn-about:hover { background: #eceef1; color: #333; opacity: 1; }
+    .btn-about svg { display: block; margin: auto; }
+    .btn-close-app:hover { background: #fdecea; color: #c0392b; border-color: #e6a39b; }
     .about-content { max-height: 90vh; overflow-y: auto; }
     .about-content h3 { font-size: 0.95rem; margin: 14px 0 4px; color: #333; }
     .about-content p, .about-content li { font-size: 0.9rem; color: #444; line-height: 1.5; }
@@ -434,6 +452,9 @@
     }
 
     .color-option {
+      padding: 0 !important;
+      flex: none;
+      box-sizing: border-box;
       width: 32px;
       height: 32px;
       border-radius: 50%;
@@ -468,6 +489,11 @@
       );
     }
 
+    /* Nas bolinhas, as fileiras de emoji não cabem: fica só o emoji central */
+    .color-option.color-daisies-purple::before, .color-option.color-daisies-purple::after,
+    .color-option.color-pastel-roses::before, .color-option.color-pastel-roses::after { display: none; }
+    .color-option.color-daisies-purple, .color-option.color-pastel-roses { font-size: 1rem; line-height: 1; }
+
     .color-option.color-rainbow-blue {
       background-color: #81d4fa;
       background-image: radial-gradient(circle at 50% 120%, transparent 42%, #ff7675 45%, #fab1a0 50%, #ffeaa7 55%, #55efc4 60%, #74b9ff 65%, #a29bfe 70%, transparent 73%);
@@ -494,7 +520,18 @@
       <button class="btn-trash" id="btnTrash" onclick="openTrash()">🗑️ Lixeira</button>
       <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
     </div>
-    <button class="btn-about" onclick="openAbout()" title="Sobre" aria-label="Sobre o aplicativo">?</button>
+    <div class="header-corner">
+      <button class="btn-about" onclick="openAbout()" title="Sobre" aria-label="Sobre o aplicativo">?</button>
+      <button class="btn-about btn-close-app" onclick="closeApp()" title="Fechar o aplicativo" aria-label="Fechar o aplicativo">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="5" y="3" width="11" height="18" rx="1"/>
+          <path d="M5 3l8 2.2v13.6L5 21z" fill="currentColor" fill-opacity="0.25"/>
+          <circle cx="11" cy="12" r="0.9" fill="currentColor" stroke="none"/>
+          <path d="M19 9.5c.8 1.6.8 3.4 0 5"/>
+          <path d="M21.5 8c1.4 2.6 1.4 5.4 0 8"/>
+        </svg>
+      </button>
+    </div>
   </header>
 
   <div class="notes-grid" id="notesGrid"></div>
@@ -504,7 +541,7 @@
     <div class="modal-content about-content">
       <img class="about-icon" src="icons/icon-192.png" alt="Ícone do app">
       <h2>Meus Post-its</h2>
-      <p class="about-version">Versão 10.02</p>
+      <p class="about-version">Versão 10.03</p>
       <p>Aplicativo de notas adesivas, simples, gratuito e que funciona offline. Suas notas ficam salvas somente no seu dispositivo.</p>
 
       <h3>📲 Como usar</h3>
@@ -675,15 +712,19 @@
 
     // ---------- Configurações de texto (cor e tamanho) ----------
     const TRASH_DAYS = 30;
+    const ORANGE = '#ff9a4d';   // laranja do tema do app (mesmo da barra/ícone)
+    const LILAC  = '#b784e0';
+    // v = cor do texto, o = cor do contorno (vazio = sem contorno)
     const TEXT_COLORS = [
-      { v: '',        t: 'Padrão' },
-      { v: '#222222', t: 'Preto' },
-      { v: '#ffffff', t: 'Branco' },
-      { v: '#b71c1c', t: 'Vermelho' },
-      { v: '#0d47a1', t: 'Azul' },
-      { v: '#1b5e20', t: 'Verde' },
-      { v: '#6a1b9a', t: 'Roxo' },
-      { v: '#4e342e', t: 'Marrom' }
+      { v: '',        o: '',     t: 'Padrão' },
+      { v: '#222222', o: '',     t: 'Preto' },
+      { v: '#ffffff', o: '',     t: 'Branco' },
+      { v: '#b71c1c', o: '',     t: 'Vermelho' },
+      { v: '#0d47a1', o: '',     t: 'Azul' },
+      { v: '#1b5e20', o: '',     t: 'Verde' },
+      { v: ORANGE,    o: LILAC,  t: 'Laranja com contorno lilás' },
+      { v: LILAC,     o: ORANGE, t: 'Lilás com contorno laranja' },
+      { v: '#f2ff00', o: '',     t: 'Amarelo fluorescente' }
     ];
     const FONT_SIZES = {
       s:  { f: 0.85, t: 'Pequena' },
@@ -692,6 +733,7 @@
       xl: { f: 1.5,  t: 'Extra grande' }
     };
     let selectedTextColor = '';
+    let selectedTextOutline = '';
     let selectedFontSize = 'm';
 
     const DRAG_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="#555" aria-hidden="true"><circle cx="4" cy="3" r="1.4"/><circle cx="10" cy="3" r="1.4"/><circle cx="4" cy="7" r="1.4"/><circle cx="10" cy="7" r="1.4"/><circle cx="4" cy="11" r="1.4"/><circle cx="10" cy="11" r="1.4"/></svg>';
@@ -703,17 +745,21 @@
     // Ordem de exibição: menor vem primeiro. Notas antigas (sem "order") mantêm "mais nova primeiro".
     function sortKey(n) { return typeof n.order === 'number' ? n.order : -n.id; }
 
-    function applyTextStyle(el, textColor, fontSize) {
+    function applyTextStyle(el, textColor, fontSize, outline) {
       const tc = safeTextColor(textColor);
+      const to = safeTextColor(outline);
       if (tc) el.style.setProperty('--tc', tc); else el.style.removeProperty('--tc');
+      if (tc && to) { el.style.setProperty('--to', to); el.classList.add('has-outline'); }
+      else { el.style.removeProperty('--to'); el.classList.remove('has-outline'); }
       el.style.setProperty('--fs', FONT_SIZES[safeFontSize(fontSize)].f);
     }
 
     function buildTextControls() {
       document.getElementById('textColorPicker').innerHTML = TEXT_COLORS.map(function(c) {
-        return '<div class="tc-option' + (c.v ? '' : ' tc-auto') + '" data-tc="' + c.v + '"' +
-          (c.v ? ' style="background:' + c.v + '"' : '') +
-          ' onclick="selectTextColor(\'' + c.v + '\')" title="' + c.t + '">' + (c.v ? '' : 'A') + '</div>';
+        const style = c.v ? 'background:' + c.v + (c.o ? ';border:4px solid ' + c.o : '') : '';
+        return '<div class="tc-option' + (c.v ? '' : ' tc-auto') + '" data-tc="' + c.v + '" data-to="' + c.o + '"' +
+          (style ? ' style="' + style + '"' : '') +
+          ' onclick="selectTextColor(\'' + c.v + '\',\'' + c.o + '\')" title="' + c.t + '">' + (c.v ? '' : 'A') + '</div>';
       }).join('');
       document.getElementById('fontSizePicker').innerHTML = Object.keys(FONT_SIZES).map(function(k) {
         return '<div class="fs-option" data-fs="' + k + '" onclick="selectFontSize(\'' + k + '\')" title="' +
@@ -746,7 +792,7 @@
           const card = document.createElement("div");
           card.className = `postit color-${safeColorName(note.color)}`;
           card.dataset.id = note.id;
-          applyTextStyle(card, note.textColor, note.fontSize);
+          applyTextStyle(card, note.textColor, note.fontSize, note.textOutline);
           card.innerHTML = `
             <div class="drag-handle" title="Arraste para reorganizar" aria-label="Arrastar para reorganizar">${DRAG_SVG}</div>
             <div>
@@ -775,6 +821,7 @@
         title, content,
         color: selectedColor,
         textColor: selectedTextColor,
+        textOutline: selectedTextOutline,
         fontSize: selectedFontSize,
         date: new Date().toISOString()
       };
@@ -813,7 +860,7 @@
           document.getElementById("noteTitleInput").value = note.title;
           document.getElementById("noteContentInput").value = note.content;
           selectColor(note.color || 'yellow');
-          selectTextColor(safeTextColor(note.textColor));
+          selectTextColor(safeTextColor(note.textColor), safeTextColor(note.textOutline));
           selectFontSize(safeFontSize(note.fontSize));
           document.getElementById("modalTitle").innerText = "Editar Post-it";
           document.getElementById("noteModal").style.display = "flex";
@@ -826,7 +873,7 @@
       document.getElementById("noteTitleInput").value = "";
       document.getElementById("noteContentInput").value = "";
       selectColor('yellow');
-      selectTextColor('');
+      selectTextColor('', '');
       selectFontSize('m');
       document.getElementById("modalTitle").innerText = "Novo Post-it";
       document.getElementById("noteModal").style.display = "flex";
@@ -839,7 +886,7 @@
     function updatePreview() {
       const pv = document.getElementById('notePreview');
       pv.className = 'postit postit-preview color-' + safeColorName(selectedColor);
-      applyTextStyle(pv, selectedTextColor, selectedFontSize);
+      applyTextStyle(pv, selectedTextColor, selectedFontSize, selectedTextOutline);
     }
 
     window.selectColor = function(color) {
@@ -850,10 +897,12 @@
       updatePreview();
     };
 
-    window.selectTextColor = function(value) {
+    window.selectTextColor = function(value, outline) {
+      outline = outline || '';
       selectedTextColor = value;
+      selectedTextOutline = outline;
       document.querySelectorAll('.tc-option').forEach(el => {
-        el.classList.toggle('selected', el.dataset.tc === value);
+        el.classList.toggle('selected', el.dataset.tc === value && (el.dataset.to || '') === outline);
       });
       updatePreview();
     };
@@ -1143,6 +1192,13 @@
       });
     }
     // ---------- Sobre / PWA ----------
+    window.closeApp = function() {
+      // Navegadores só deixam fechar a janela em alguns casos (ex.: app instalado no computador).
+      window.close();
+      setTimeout(function() {
+        showToast("Neste aparelho não é possível fechar por aqui. Use o botão Voltar ou feche pela tela de apps recentes.");
+      }, 400);
+    };
     window.openAbout = function() {
       document.getElementById("aboutModal").style.display = "flex";
     };
